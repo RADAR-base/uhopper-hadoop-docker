@@ -15,8 +15,8 @@ if [ -z ${HADOOP_VERSION+x} ]; then
   exit 1
 fi
 
-for i in hadoop namenode datanode resourcemanager nodemanager historyserver spark; do
+for i in hadoop namenode datanode; do
     echo Building $i
     [ "$i" = "hadoop" ] && name="hadoop" || name="hadoop-$i"
-    ( cd $i && docker build --build-arg HADOOP_VERSION=$HADOOP_VERSION --build-arg HADOOP_TAG=$HADOOP_TAG -t infotechsoft/$name:$HADOOP_TAG . )
+    ( cd $i && docker build --build-arg HADOOP_VERSION=$HADOOP_VERSION --build-arg HADOOP_TAG=$HADOOP_TAG -t radarbase/k8s-$name:$HADOOP_TAG . && docker push radarbase/k8s-$name:$HADOOP_TAG)
 done

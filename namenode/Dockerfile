@@ -1,5 +1,5 @@
 ARG HADOOP_TAG
-FROM infotechsoft/hadoop:${HADOOP_TAG}
+FROM radarbase/k8s-hadoop:${HADOOP_TAG}
 
 ENV HDFS_CONF_dfs_namenode_name_dir=file:///hadoop/dfs/name
 RUN mkdir -p /hadoop/dfs/name

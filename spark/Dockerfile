@@ -1,5 +1,5 @@
 ARG HADOOP_TAG
-FROM infotechsoft/hadoop:${HADOOP_TAG}
+FROM radarbase/k8s-hadoop:${HADOOP_TAG}
 
 ARG SPARK_VERSION=2.3.1
 ENV SPARK_VERSION ${SPARK_VERSION}
@@ -23,7 +23,7 @@ RUN chmod a+x \
     /spark-historyserver.sh \
     /spark-master.sh \
     /spark-slave.sh
-    
+
 RUN echo "export SPARK_DIST_CLASSPATH=$(hadoop classpath)" >> /opt/spark-$SPARK_VERSION/conf/spark-env.sh
 
 ENTRYPOINT ["/spark-entrypoint.sh"]

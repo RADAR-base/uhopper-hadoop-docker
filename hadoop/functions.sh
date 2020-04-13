@@ -1,11 +1,11 @@
 #!/bin/bash
 
 apache_mirror() {
-    BASE_URI=$(curl -L http://www.apache.org/dyn/closer.cgi$1\?asjson\=1 | grep -Eo '"preferred":.*?".*?[^\\]"' | cut -d ' ' -f 2 | sed 's/"//g')
+    BASE_URI=$(curl -v -L http://www.apache.org/dyn/closer.cgi$1\?asjson\=1 | grep -Eo '"preferred":.*?".*?[^\\]"' | cut -d ' ' -f 2 | sed 's/"//g')
     echo $BASE_URI$1
 }
 
-# Attempt to download Apache project from mirror, otherwise fallback to Apache archive. places 
+# Attempt to download Apache project from mirror, otherwise fallback to Apache archive. places
 # downloaded file in the `/tmp` directory
 #
 # Arguments:
@@ -13,16 +13,16 @@ apache_mirror() {
 apache_dl() {
     DL_URL=$(apache_mirror $1)
     APACHE_FN=$(basename $1)
-    curl -fSL $DL_URL -o /tmp/$APACHE_FN
+    curl -v -fSL $DL_URL -o /tmp/$APACHE_FN
     if [ $? != 0 ]; then
         # Not in mirror, download from archive
-        curl -fSL "https://archive.apache.org/dist/$1" -o /tmp/$APACHE_FN
+        curl -v -fSL "https://archive.apache.org/dist/$1" -o /tmp/$APACHE_FN
         SIG_URL=https://archive.apache.org/dist/$1.asc
     else
         # Downloaded from mirror, grab keys from release repo
         SIG_URL=https://dist.apache.org/repos/dist/release/$1.asc
     fi
-    curl -fSL "$SIG_URL" -o /tmp/$APACHE_FN.asc
+    curl -v -fSL "$SIG_URL" -o /tmp/$APACHE_FN.asc
     echo "/tmp/$APACHE_FN"
 }
 
@@ -32,7 +32,7 @@ apache_dl() {
 #   Path to package to verify, signature should be in same path with .asc appended to name
 #   URL path to KEYS file for Apache project
 apache_verify() {
-    curl -fSL https://dist.apache.org/repos/dist/release/$2 -o /tmp/KEYS
+    curl -v -fSL https://dist.apache.org/repos/dist/release/$2 -o /tmp/KEYS
     gpg --no-default-keyring --keyring /tmp/keys.gpg --import /tmp/KEYS
     if gpgv --keyring /tmp/keys.gpg $1.asc $1; then
         rm -rf /tmp/keys.gpg* /tmp/KEYS
@@ -77,9 +77,9 @@ configure() {
 
     local var
     local value
-    
+
     echo "Configuring $module"
-    for c in `printenv | perl -sne 'print "$1 " if m/^${envPrefix}_(.+?)=.*/' -- -envPrefix=$envPrefix`; do 
+    for c in `printenv | perl -sne 'print "$1 " if m/^${envPrefix}_(.+?)=.*/' -- -envPrefix=$envPrefix`; do
         name=`echo ${c} | perl -pe 's/___/-/g; s/__/_/g; s/_/./g'`
         var="${envPrefix}_${c}"
         value=${!var}
